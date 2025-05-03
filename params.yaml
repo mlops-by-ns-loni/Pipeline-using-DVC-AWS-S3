@@ -1,0 +1,5 @@
+data_ingestion:
+  root_dir: data/raw
+  source_url: https://github.com/mlops-by-ns-loni/Pipeline-using-DVC-AWS-S3/blob/main/experiments/spam.csv
+  local_data_file: experiment/spam.csv
+  test_size: 0.2
