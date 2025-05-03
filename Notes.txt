@@ -1,0 +1,137 @@
+Day - 2 Notes on scr:
+
+Great question! When designing a robust **MLOps pipeline**, each script (like `data_ingestion.py`, `data_preprocessing.py`, etc.) plays a specific and crucial role in **automating and maintaining the lifecycle of an ML project**.
+
+Here's a breakdown of each script, its **purpose**, **key functions**, and how it fits into the **MLOps workflow**:
+
+---
+
+### 🔹 1. `data_ingestion.py`
+
+**📌 Purpose:**
+To fetch or load raw data from a source (URL, S3, local CSV, SQL, API), verify it, and save it for further processing.
+
+**🧠 Responsibilities:**
+
+* Download data from external or internal sources.
+* Save data to a predefined directory (`data/raw/`).
+* Split into training and test datasets (optional).
+* Log metadata (rows, columns, format, etc.).
+
+**✅ Example tasks:**
+
+```python
+df = pd.read_csv(source_url)
+df.to_csv(local_data_file)
+train_df, test_df = train_test_split(df, test_size=params["test_size"])
+```
+
+---
+
+### 🔹 2. `data_preprocessing.py`
+
+**📌 Purpose:**
+Clean and prepare the raw data before feature engineering.
+
+**🧠 Responsibilities:**
+
+* Handle missing values.
+* Remove duplicates or outliers.
+* Normalize formats (date, strings, etc.).
+* Convert datatypes.
+
+**✅ Example tasks:**
+
+```python
+df.dropna(inplace=True)
+df['text'] = df['text'].str.lower().str.replace('[^a-zA-Z]', '')
+```
+
+---
+
+### 🔹 3. `feature_engineering.py`
+
+**📌 Purpose:**
+Transform clean data into meaningful features that enhance model performance.
+
+**🧠 Responsibilities:**
+
+* Vectorize text (TF-IDF, word embeddings).
+* Create or select important features.
+* Scale or normalize numerical features.
+* Encode categorical variables.
+
+**✅ Example tasks:**
+
+```python
+vectorizer = TfidfVectorizer(max_features=params["max_features"])
+X_tfidf = vectorizer.fit_transform(df["text"])
+```
+
+---
+
+### 🔹 4. `model_building.py`
+
+**📌 Purpose:**
+Train a machine learning model using the engineered features and save the trained model.
+
+**🧠 Responsibilities:**
+
+* Load processed training data.
+* Initialize model using `params.yaml` hyperparameters.
+* Train the model.
+* Save the trained model to disk (`models/model.pkl`).
+
+**✅ Example tasks:**
+
+```python
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+joblib.dump(model, 'models/model.pkl')
+```
+
+---
+
+### 🔹 5. `model_evaluation.py`
+
+**📌 Purpose:**
+Evaluate model performance on test data using metrics and log them (possibly with `dvclive` or MLflow).
+
+**🧠 Responsibilities:**
+
+* Load trained model and test data.
+* Predict and calculate metrics like accuracy, precision, recall, F1-score, AUC.
+* Log metrics for experiment tracking.
+* Visualize confusion matrix, ROC curve (optional).
+
+**✅ Example tasks:**
+
+```python
+preds = model.predict(X_test)
+accuracy = accuracy_score(y_test, preds)
+with Live() as live:
+    live.log_metric("accuracy", accuracy)
+```
+
+---
+
+### 🧪 Full MLOps Flow (Simplified)
+
+```
+data_ingestion.py → data_preprocessing.py → feature_engineering.py → model_building.py → model_evaluation.py
+             ↓                        ↓                        ↓                       ↓                    ↓
+         data/raw/             data/cleaned/         data/processed/          models/model.pkl      metrics (dvclive)
+```
+
+---
+
+### ✅ Benefits of Modularization
+
+**Reusability**: Easy to modify parts independently.
+**Versioning**: Track changes using DVC and Git.
+**Automation**: Can plug into CI/CD pipelines.
+**Scalability**: Add hyperparameter tuning, drift monitoring, etc.
+
+---
+
+Would you like a directory structure and `params.yaml` template that ties all these together?
