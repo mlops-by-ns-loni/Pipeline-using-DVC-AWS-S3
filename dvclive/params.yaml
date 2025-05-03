@@ -1,0 +1,21 @@
+data_ingestion:
+  root_dir: data/raw
+  source_url: 
+    https://github.com/mlops-by-ns-loni/Pipeline-using-DVC-AWS-S3/blob/main/experiments/spam.csv
+  local_data_file: experiment/spam.csv
+  test_size: 0.2
+feature_engineering:
+  selected_features:
+  - feature1
+  - feature2
+  - feature3
+  scaling: true
+  encoding: onehot
+  output_dir: data/processed
+  max_features: 100
+model_building:
+  model_type: random_forest
+  n_estimators: 100
+  max_depth: 10
+  random_state: 42
+  output_model_path: models/model.pkl
